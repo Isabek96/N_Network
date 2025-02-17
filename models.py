@@ -12,7 +12,7 @@ class Base(ABC): #Абстрактный базовый класс для все
         forward(x): Выполняет прямое распространение (forward pass).
         backward(grad): Выполняет обратное распространение ошибки (backpropagation).
         update(lr): Обновляет параметры модели с использованием градиентов.
-    """132
+    """
 
     @abstractmethod
     def forward(self, x):
