@@ -1,6 +1,7 @@
 from models import Base
+import numpy as np
 
-class NeuralNetwork(Base):
+class NeuralNetwork(Base): # Базовая модель для нейронных сетей
     def __init__(self):
         pass
 
