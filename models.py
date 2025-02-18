@@ -57,7 +57,7 @@ class Base(ABC): #Абстрактный базовый класс для все
 class Neuron(Base): # Нейрон
 
     def __init__(self, input_size: int):
-        self.weights = np.random.randn(input_size) # Веса нейрона
+        self.weights = np.random.randn(input_size + 1) # Веса нейрона
         self.bias = np.random.randn() # Бias нейрона
         self.input = None # Входные данные нейрона
         self.output = None # Выходные данные нейрона
@@ -66,7 +66,8 @@ class Neuron(Base): # Нейрон
     def forward(self, *args, **kwargs):
         "Прямое распространение: взвешенная сумма + активация"
         self.input = args # Принимаем входные данные
-        self.output = sigmoid(np.dot(self.input, self.weights) + self.bias) # Вычисляем выходные данные нейрона
+        z = np.dot(self.input, self.weights) + self.bias # Вычисляем взвешенную сумму
+        self.output = np.dot(self.input, self.weights) + self.bias # Вычисляем выходные данные нейрона
         return self.output # Возвращаем выходные данные нейрона
 
 
@@ -84,14 +85,14 @@ class Neuron(Base): # Нейрон
 
 class Layer(Base): # Нейронные слои
 
-    def __init__(self):
-        pass
-
+    def __init__(self, num_neurons: int, input_size: int):
+        self.neurons = [Neuron(input_size) for _ in range(num_neurons)] # Список нейронов слоя
     def forward(self, x):
-        pass
+        return np.array([neuron.forward(x) for neuron in self.neurons]) #Выход слоя после прямого распространения
 
     def backward(self, grad):
-        pass
+        return np.array([neuron.backward(grad) for neuron in self.neurons])  # Градиенты слоя
 
     def update(self, lr):
-        pass
+        for neuron in self.neurons:
+            neuron.update(lr)  # Обновление весов нейронов слоя

@@ -1,25 +1,30 @@
-from models import Base
+from models import Base, Layer
 import numpy as np
 
 class NeuralNetwork(Base): # Базовая модель для нейронных сетей
     def __init__(self):
-        pass
+        self.layers = [] # Список слоев нейросети
 
-    def set_structure(self):
+
+    def set_structure(self, layers):
         """Задает структуру слоев нейросети
 
         :return: None
         """
-        pass
+        self.layers = layers
 
     def forward(self, x):
-        pass
+        for layer in self.layers:
+            x = layer.forward(x)
+        return x # Возвращает предсказание нейросети
 
     def backward(self, grad):
-        pass
+        for layer in reversed(self.layers): # Обратный проход
+            grad = layer.backward(grad)
 
     def update(self, lr):
-        pass
+        for layer in self.layers: # Обновление весов и смещений слоев с использованием гра��иентного спуска
+            layer.update(lr)
 
     def train(self, X, Y, epochs=1000, lr=0.1):
         """Обучает нейросеть с помощью градиентного спуска.
@@ -53,4 +58,17 @@ class NeuralNetwork(Base): # Базовая модель для нейронны
             - Изменяет веса и параметры модели в процессе обучения.
             - Может выводить информацию о процессе обучения (например, значение функции потерь).
         """
-        pass
+        output = self.forward(X)
+
+        # Вычисление ошибки (например, MSE)
+        loss = np.mean((output - Y) ** 2)
+
+        # Обратное распространение
+        grad = 2 * (output - Y) / Y.shape[0]  # Градиент ошибки (для MSE)
+        self.backward(grad)
+
+        # Обновление весов
+        self.update(lr)
+
+        if epochs % 100 == 0:
+            print(f"Epoch {epochs}, Loss: {loss:.4f}")

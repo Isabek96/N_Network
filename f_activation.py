@@ -14,7 +14,7 @@ def relu(x):
 
 def relu_derivative(x):
     # Производная Relu активации
-    return (x > 0).astype(float)
+    return np.where(x > 0, 1, 0)
 
 def tanh(x):
     # Tanh (Hyperbolic Tangent) активация
@@ -22,4 +22,4 @@ def tanh(x):
 
 def tanh_derivative(x):
     # Производная Tanh активации
-    return 1 - np.square(x)
+    return 1 - np.square(np.tanh(x))  # Используем tanh(x), а не x
