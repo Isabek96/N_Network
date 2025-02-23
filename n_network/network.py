@@ -1,18 +1,37 @@
-from models import Base
+from .models import Base, Layer
+from typing import List
+
 
 class NeuralNetwork(Base):
-    def __init__(self):
-        pass
 
-    def set_structure(self):
+    @property
+    def layers(self):
+        return self._layers
+
+    def __init__(self):
+        self._layers = None
+
+    def __repr__(self):
+        return (f'Network with {len(self._layers) - 2} hidden layers.'
+                f' Input size: {self._layers[0].size}, output size:{self._layers[-1].size}')
+
+    def setup(self, list_of_layers: List[Layer]):
         """Задает структуру слоев нейросети
 
         :return: None
         """
-        pass
+        self._layers = list_of_layers
+        for previous_layer, layer in zip(self._layers[:-1], self._layers[1:]):
+            layer.init_weights(previous_layer.size)
 
     def forward(self, x):
-        pass
+        if not self._layers:
+            raise RuntimeError('The network has no layers')
+        output = x.copy()
+        for layer in self._layers:
+            output = layer.forward(output)
+        return output
+
 
     def backward(self, grad):
         pass

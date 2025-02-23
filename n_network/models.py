@@ -64,6 +64,10 @@ class Layer(Base):
         return self._biases
 
     @property
+    def size(self):
+        return self._biases.size
+
+    @property
     def weights(self):
         return self._weights
 
@@ -71,21 +75,34 @@ class Layer(Base):
     def weights(self, value):
         raise RuntimeError('The weights can not be set directly')
 
-    def __init__(self, m: int = 1, n: int = 1, activation: Callable = relu):
+    def __repr__(self):
+        return f'Layer ({self.size}) Input size: {self._weights.shape[1]}'
+
+    def __init__(self, m: int = 1, activation: Callable = relu):
         """
         Конструктор класса, создает слой для полносвязной сети из нейронов (линейных)
+
         :param m: количество нейронов в слое
-        :param n: размерность вектора входа
         :param activation: функция активации
         """
-        # инициализация весов случайный образом
-        self._weights = np.random.randn(m, n)
+        # вектор весов будет задан позже, здесь резервируем переменную
+        self._weights = None
 
         # инициализация смещений случайным образом
         self._biases = np.random.randn(m)
 
         # векторизации функции активации для дальнейшего применения
         self._activation = np.vectorize(activation)
+
+    def init_weights(self, n: int = 1):
+        """
+        Инициализация весов
+
+        :param n: размерность вектора входа
+        :return: None
+        """
+        # инициализация весов случайный образом
+        self._weights = np.random.randn(self.size, n)
 
     def forward(self, x):
         """
@@ -99,6 +116,31 @@ class Layer(Base):
 
         # применения поэлементно функции активации к полученному вектору выходов
         return self._activation(layer_output)
+
+    def backward(self, grad):
+        pass
+
+    def update(self, lr):
+        pass
+
+
+class InputLayer(Base):
+    """
+    Модель входного слоя, который имеет меньше свойств по сравнению с другими слоями.
+
+    """
+    @property
+    def size(self):
+        return self._size
+
+    def __init__(self, m: int = 1):
+        self._size = m
+
+    def __repr__(self):
+        return f'Input layer ({self.size})'
+
+    def forward(self, x):
+        return x
 
     def backward(self, grad):
         pass
