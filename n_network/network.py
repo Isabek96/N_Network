@@ -25,6 +25,13 @@ class NeuralNetwork(Base):
             layer.init_weights(previous_layer.size)
 
     def forward(self, x):
+        """
+        Метод, реализующий прямой проход сети.
+
+        :param x: Данные, поданные на вход сети
+        :return: Отклик сети
+        """
+
         if not self._layers:
             raise RuntimeError('The network has no layers')
         output = x.copy()
