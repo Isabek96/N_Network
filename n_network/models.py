@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import Callable
+
 import numpy as np
+
+from .f_activation import relu
 
 
 class Base(ABC):
@@ -53,30 +57,48 @@ class Base(ABC):
         pass
 
 
-
-class Neuron(Base):
-
-    def __init__(self, input_size: int):
-        self.weights = np.random.randn(input_size)
-        self.bias = np.random.randn()
-
-    def forward(self, *args, **kwargs):
-        pass
-
-    def backward(self, grad):
-        pass
-
-    def update(self, *args, **kwargs):
-        pass
-
-
 class Layer(Base):
 
-    def __init__(self):
-        pass
+    @property
+    def biases(self):
+        return self._biases
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, value):
+        raise RuntimeError('The weights can not be set directly')
+
+    def __init__(self, m: int = 1, n: int = 1, activation: Callable = relu):
+        """
+        Конструктор класса, создает слой для полносвязной сети из нейронов (линейных)
+        :param m: количество нейронов в слое
+        :param n: размерность вектора входа
+        :param activation: функция активации
+        """
+        # инициализация весов случайный образом
+        self._weights = np.random.randn(m, n)
+
+        # инициализация смещений случайным образом
+        self._biases = np.random.randn(m)
+
+        # векторизации функции активации для дальнейшего применения
+        self._activation = np.vectorize(activation)
 
     def forward(self, x):
-        pass
+        """
+        Прямой проход слоя
+        :param x: вектор входа
+        :return: отклик слоя в виде вектора, которая содержит m координат
+        """
+
+        # расчет выходов нейронов в векторной форме
+        layer_output = np.dot(self._weights, x) + self._biases
+
+        # применения поэлементно функции активации к полученному вектору выходов
+        return self._activation(layer_output)
 
     def backward(self, grad):
         pass
