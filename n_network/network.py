@@ -1,4 +1,4 @@
-from .models import Base, Layer
+from models import Base, Layer
 from typing import List
 
 
@@ -41,10 +41,17 @@ class NeuralNetwork(Base):
 
 
     def backward(self, grad):
-        pass
+        """
+            Метод обратного распространения ошибки.
+
+            :param grad: Градиент ошибки от функции потерь
+            """
+        for layer in reversed(self._layers):
+            grad = layer.backward(grad)
 
     def update(self, lr):
-        pass
+        for layer in self._layers:
+            layer.update(lr)
 
     def train(self, X, Y, epochs=1000, lr=0.1):
         """Обучает нейросеть с помощью градиентного спуска.

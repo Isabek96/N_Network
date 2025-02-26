@@ -3,7 +3,7 @@ from typing import Callable
 
 import numpy as np
 
-from .f_activation import relu
+from f_activation import relu
 
 
 class Base(ABC):
@@ -94,6 +94,11 @@ class Layer(Base):
         # векторизации функции активации для дальнейшего применения
         self._activation = np.vectorize(activation)
 
+        self._input = None
+        self._grad_weights = None
+        self._grad_biases = None
+
+
     def init_weights(self, n: int = 1):
         """
         Инициализация весов
@@ -110,7 +115,7 @@ class Layer(Base):
         :param x: вектор входа
         :return: отклик слоя в виде вектора, которая содержит m координат
         """
-
+        self._input = x
         # расчет выходов нейронов в векторной форме
         layer_output = np.dot(self._weights, x) + self._biases
 
@@ -118,11 +123,23 @@ class Layer(Base):
         return self._activation(layer_output)
 
     def backward(self, grad):
-        pass
+        """
+        Обратное распространение ошибки.
+        :param grad: Градиент от следующего слоя.
+        :return: Градиент, передаваемый дальше в предыдущий слой.
+        """
+        self._grad_weights = np.dot(grad.reshape(-1, 1), self._input.reshape(1, -1))
+        self._grad_biases = grad
+        return np.dot(self._weights.T, grad)
 
     def update(self, lr):
-        pass
-
+        """
+           Обновление параметров
+           :param lr: скорость обучения
+        """
+        if hasattr(self, "_grad_weights") and hasattr(self, "_grad_biases"):
+            self._weights -= lr * self._grad_weights
+            self._biases -= lr * self._grad_biases
 
 class InputLayer(Base):
     """
@@ -143,7 +160,6 @@ class InputLayer(Base):
         return x
 
     def backward(self, grad):
-        pass
-
+        return grad
     def update(self, lr):
         pass
